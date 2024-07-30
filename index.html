@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BULDOK GANTENG</title>
+    <style>
+        body {
+            background: #000; /* Latar belakang hitam solid */
+            color: #00FF00; /* Warna teks hijau stabilo */
+            font-family: 'Courier New', Courier, monospace; /* Font monospace */
+            margin: 0;
+            padding: 0;
+            overflow: auto; /* Memungkinkan scroll global */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Memastikan halaman memenuhi tinggi viewport */
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8); /* Bayangan hijau */
+            background: rgba(0, 0, 0, 0.8); /* Background semi-transparan */
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em; /* Ukuran font header */
+            font-weight: bold; /* Menebalkan teks header */
+            text-shadow: 0 0 15px #00FF00; /* Efek cahaya hijau pada header */
+            margin: 0 0 20px;
+        }
+        .info {
+            background: rgba(0, 0, 0, 0.9); /* Background semi-transparan */
+            border: 2px solid #00FF00; /* Garis tepi hijau stabilo */
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 70vh; /* Batas tinggi maksimum untuk scroll pada perangkat kecil */
+            overflow-y: auto; /* Menangani overflow vertikal dengan scroll */
+            font-size: 1em; /* Ukuran font */
+            line-height: 1.6; /* Jarak antar baris */
+            white-space: pre-wrap; /* Mempertahankan format teks */
+            text-align: left; /* Rata kiri untuk informasi */
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.6); /* Bayangan hijau */
+            position: relative;
+        }
+        .info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('glitch-effect.png'); /* Gambar efek glitch */
+            opacity: 0.2;
+            z-index: -1;
+            mix-blend-mode: overlay;
+        }
+        .info p {
+            margin: 0 0 10px;
+            opacity: 0; /* Awalnya tidak terlihat */
+            animation: typing 1s steps(30, end) forwards, fadeIn 0.5s ease forwards; /* Animasi ketik dan fadeIn */
+        }
+
+        /* Animasi ketik */
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+        
+        /* Animasi fadeIn */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .info {
+                font-size: 0.9em; /* Ukuran font lebih kecil untuk tampilan mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Informasi Pengguna</h1>
+        <div class="info" id="info">
+            <!-- Data akan ditampilkan di sini menggunakan JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const token = '2df3460d2261a0'; // Token API ipinfo.io
+
+        // Fungsi untuk menampilkan informasi berdasarkan data yang diambil
+        async function displayUserInformation() {
+            try {
+                const ipResponse = await fetch(`https://ipinfo.io/json?token=${token}`);
+                const ipData = await ipResponse.json();
+                
+                const ip = ipData.ip;
+                const locationData = {
+                    country_name: ipData.country,
+                    region: ipData.region,
+                    city: ipData.city,
+                    postal: ipData.postal
+                };
+                
+                const hardwareData = {
+                    deviceType: navigator.userAgent.includes('Mobi') ? 'Mobile/Tablet' : 'PC/Desktop'
+                };
+
+                const infoDiv = document.getElementById('info');
+                const dataToShow = `
+                    IP Address (Public): ${ip}
+                    Negara: ${locationData.country_name}
+                    Provinsi: ${locationData.region}
+                    Kota: ${locationData.city}
+                    Postal Code: ${locationData.postal}
+                    Layar Komputer: ${screen.width}x${screen.height}
+                    Ukuran Jendela Browser: ${window.innerWidth}x${window.innerHeight}
+                    Jenis Perangkat Lunak: ${navigator.appName}
+                    Versi Perangkat Lunak: ${navigator.appVersion}
+                    Agen Pengguna: ${navigator.userAgent}
+                    Platform Operasional: ${navigator.platform}
+                    Versi Sistem Operasi: ${navigator.oscpu || 'Not available'}
+                    Rasio Piksel Perangkat: ${window.devicePixelRatio}
+                    Mesin Tata Letak: ${navigator.product}
+                    Jumlah Inti CPU Logis: ${navigator.hardwareConcurrency}
+                    RAM: ${navigator.deviceMemory} GB
+                    Jenis Perangkat Keras: ${hardwareData.deviceType}
+                    ROM: Not available
+                    Perambaan GMT Offset: ${new Date().getTimezoneOffset() / 60}
+                    Titik Sentuh Maksimum: ${navigator.maxTouchPoints}
+                    Penjual WebGL: ${getWebGLVendor()}
+                    5 History Terakhir Browser: Not available
+                `;
+
+                // Pisahkan data menjadi array paragraf
+                const paragraphs = dataToShow.trim().split('\n').map(line => {
+                    const p = document.createElement('p');
+                    p.textContent = line.trim();
+                    return p;
+                });
+
+                // Tambahkan paragraf ke dalam infoDiv dengan interval animasi
+                paragraphs.forEach((paragraph, index) => {
+                    setTimeout(() => {
+                        infoDiv.appendChild(paragraph);
+                    }, index * 300); // Animasi muncul bertahap setiap 0.3 detik
+                });
+            } catch (error) {
+                console.error('Error displaying user information:', error);
+            }
+        }
+
+        // Fungsi untuk mendapatkan penjual WebGL (contoh)
+        function getWebGLVendor() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                return gl.getExtension('WEBGL_debug_renderer_info') ? gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_VENDOR_WEBGL : 'Not available';
+            } catch (e) {
+                return 'Not available';
+            }
+        }
+
+        // Panggil displayUserInformation saat dokumen selesai dimuat
+        document.addEventListener('DOMContentLoaded', displayUserInformation);
+    </script>
+</body>
+</html>
